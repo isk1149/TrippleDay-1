@@ -75,8 +75,7 @@ router.get('/', function (req, res, next) {
   </head>
   <body>
     <input id="pac-input" class="controls" type="text" placeholder="Search Box">
-    <div id="map"></div>
-    <div><ul id="add"></ul></div> <!-- 헌영 추가-->
+    <div id="map"></div>    
     <script>
       // This example adds a search box to a map, using the Google Place Autocomplete
       // feature. People can enter geographical searches. The search box will return a
@@ -126,16 +125,7 @@ router.get('/', function (req, res, next) {
               console.log("Returned place contains no geometry");
               return;
             }
-            
-            // 어떤 장소 선택하면 해당 장소에 대한 place_id 구하는 부분
-            // 최종 목표 : 장소 검색하면 장소 정보와 경로 추가버튼 삽입 - 인성
-            //            경로 추가 버튼 클릭시 place_id 구해서 http 쿼리 보냄
-            //            Json 리턴 받으면 이미지, 이름, 위치 등의 필요한 정보를 추출
-            //            루트 만드는 화면에 추가시키는 것이 목표
-            var output = place.place_id;    
-            var field = document.getElementById('add');
-            field.innerHTML += "<li>"+output+"</li>";         
-            
+
             var icon = {
               url: place.icon,
               size: new google.maps.Size(71, 71),
@@ -167,7 +157,7 @@ router.get('/', function (req, res, next) {
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDz1gbjauHDfo2HwoRGo5sVUsV0Hi-dOXA&libraries=places&callback=initAutocomplete"
          async defer></script>
   </body>
-</html>`
+</html>`;
 
     res.writeHead(200, {"Content-Type": "text/html; charset=utf-8"}); // 200 : 서버가 클라이언트의 요청을 정상적으로 처리함을 의미하는 코드
     res.write(sampleIndex);
