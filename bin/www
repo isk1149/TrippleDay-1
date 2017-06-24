@@ -1,0 +1,111 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+// www파일은 TrippleDay 프로젝트 시작 파일임.
+// www파일 기능 : Port 검사, 에러 핸들링 등
+// 실행 방법
+// terminal에서 TrippleDay 폴더로 이동
+// npm start 입력하거나 node .\bin\www
+// npm start로 가능한 이유 package.json파일 참고
+
+const app = require('../app');
+const debug = require('debug')('trippleday:server');
+const http = require('http');
+
+/**
+ * Get port from environment and store in Express.
+ */
+
+const port = normalizePort(process.env.PORT || '80');
+app.set('port', port);
+
+/**
+ * Create HTTP server.
+ */
+
+const server = http.createServer(app);
+
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+// **************중요**************
+// 개인 PC에서 개발할때는 #1번 활성화
+// 클라우드에서 확인할때는 #2번 활성화
+
+// --------------#1번--------------
+server.listen(port, () => {
+  console.log('Local Server running at http://127.0.0.1/');
+});
+
+// --------------#2번--------------
+// const trippleHostname = '172.27.0.89';
+//
+// server.listen(port, trippleHostname, () => {
+//   console.log('Tripple Server running at http://211.253.24.106/');
+// });
+
+server.on('error', onError);
+server.on('listening', onListening);
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val) {
+  const port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  const bind = typeof port === 'string'
+    ? 'Pipe ' + port
+    : 'Port ' + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+  const addr = server.address();
+  const bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
+  debug('Listening on ' + bind);
+}
