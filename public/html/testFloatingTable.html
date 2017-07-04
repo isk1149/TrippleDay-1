@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0">
+
+    <style>
+
+        #left{
+            background-color: pink;
+            width: 550px;
+            height: 500px;
+            /*display: inline-block;*/
+            float: left;
+        }
+
+        #right {
+            background-color: skyblue;
+            width: 550px;
+            height: 500px;
+            display: inline-block;
+        }
+
+        #map {
+            width:500px;
+            height: 300px;
+        }
+
+        table,td,tr {
+            border: 2px solid black;
+            border-collapse: collapse;
+            height: 100px
+        }
+
+    </style>
+</head>
+<body>
+<div id="left">
+    <input id="text" type="text" placeholder="Enter a location">
+
+    <div id="map"></div></br>
+    <table>
+        <tr>
+            <td id="showImg" width="300px" align="center">
+            </td>
+            <td id="content" width="400px"></td>
+            <td id="showButton" width="300px" align="center">
+                <button onclick="button()">추가</button></br>
+            </td>
+        </tr>
+    </table>
+</div>
+<div id="right">
+    <input type="radio"></br>
+    <button id="delete">삭제</button>
+    <div>
+</body>
+<script>
+    function initMap() {
+        var map = new google.maps.Map(document.getElementById('map'), {
+            center: {lat: 37.576251, lng: 126.976934},
+            zoom: 11
+        });
+
+        var input = document.getElementById('text');
+        var autocomplete = new google.maps.places.Autocomplete(input);
+        autocomplete.bindTo('bounds', map);
+
+
+        var marker = new google.maps.Marker({
+            map: map,
+            anchorPoint: new google.maps.Point(0, -29)
+        });
+        autocomplete.addListener('place_changed',function(){
+            // infowindow.close();
+            marker.setVisible(false);
+            var place = autocomplete.getPlace();
+            if(place.geometry.viewport){
+                alert(place.geometry.viewport+" view");
+                map.fitBounds(place.geometry.viewport);
+            } else{ //선호뷰포트
+                alert(place.geometry.location+"location");
+                map.setCenter(place.geometry.location);
+            }
+            marker.setPosition(place.geometry.location);
+            marker.setVisible(true);
+            var contents ='<h1>'+place.name+'</h1>'
+                +'<img src='+place.photos[0].getUrl({'maxWidth':100, 'maxHeight':100})+'></img>'
+                +'<p>'+place.formatted_address+'</p>'
+                +'<button>버튼</button>';
+            var infowindow = new google.maps.InfoWindow({
+                content: contents
+            });
+            infowindow.open(map,marker);
+            mapsClick(place);
+        });
+    }
+
+    function mapsClick(info){
+        // alert(info.name+ info.formatted_address);
+        var t1 = document.getElementById('showImg');
+        var t2 = document.getElementById('content');
+        t1.innerHTML = "<img id='tableImg' src="+info.photos[0].getUrl({'maxWidth':300, 'maxHeight':100})+"></img>";
+        t2.innerHTML = "<h3>"+info.name+"</h3>\n<h5>"+info.formatted_address+"</h5>";
+    }
+
+    function button(){
+        t1 = document.getElementById('tableImg');
+        alert(t1.src);
+    }
+
+</script>
+<script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAKHgj4JBJBo5tMAkUoeKvsNlBSTO-HIQ8&libraries=places&callback=initMap">
+</script>
+</html>

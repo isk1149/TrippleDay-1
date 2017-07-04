@@ -75,7 +75,7 @@ router.get('/', function (req, res, next) {
   </head>
   <body>
     <input id="pac-input" class="controls" type="text" placeholder="Search Box">
-    <div id="map"></div>    
+    <div id="map"></div>
     <script>
       // This example adds a search box to a map, using the Google Place Autocomplete
       // feature. People can enter geographical searches. The search box will return a

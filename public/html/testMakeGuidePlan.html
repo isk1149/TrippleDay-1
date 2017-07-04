@@ -1,0 +1,595 @@
+<!-- 변수이름 통일-->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <link href="../bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <title>TrippleDay</title>
+    <style>
+        /* Always set the map height explicitly to define the size of the div
+         * element that contains the map. */
+        #map {
+            height: 65%;
+        }
+        /* Optional: Makes the sample page fill the window. */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        .controls {
+            margin-top: 10px;
+            border: 1px solid transparent;
+            border-radius: 2px 0 0 2px;
+            box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            height: 32px;
+            outline: none;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        #pac-input {
+            background-color: #fff;
+            font-family: Roboto;
+            font-size: 15px;
+            font-weight: 300;
+            margin-left: 12px;
+            padding: 0 11px 0 13px;
+            text-overflow: ellipsis;
+            width: 300px;
+        }
+
+        #pac-input:focus {
+            border-color: #4d90fe;
+        }
+
+        .pac-container {
+            font-family: Roboto;
+        }
+
+        #type-selector {
+            color: #fff;
+            background-color: #4d90fe;
+            padding: 5px 11px 0px 11px;
+        }
+
+        #type-selector label {
+            font-family: Roboto;
+            font-size: 13px;
+            font-weight: 300;
+        }
+        #target {
+            width: 345px;
+        }
+
+        #left_box {
+            background: #AECAEA;
+            float: left;
+            width: 50%;
+            height:100%;
+        }
+
+        #right_box {
+            background: #E1C8A8;
+            float: right;
+            width: 50%;
+            height:100%;
+        }
+
+        #top_box {
+            background: #CEF8E5;
+            width: 100%;
+            height:10%;
+            text-align:center;
+        }
+
+        li{
+            list-style:none;
+        }
+
+        table{
+            width:100%;
+            height:20%;
+            border: 1px solid black;
+            margin-top: 3px;
+        }
+
+        td{
+            border: 1px solid black;
+            text-align:center;
+            width:25%;
+        }
+
+        td img{
+            width:100%;
+            height:100%;
+        }
+
+        td button{
+            width: 30%;
+            height: 30%;
+        }
+
+    </style>
+</head>
+<body>
+<div id='top_box'>TrippleDay</div>
+<div id='left_box'> 왼쪽
+    <input id="pac-input" class="controls" type="text" placeholder="Search Box">
+    <div id="map"></div>
+    <table>
+        <tr>
+            <td id='photo_column'></td>
+            <td id='address_column'></td>
+            <td id='button_column'></td>
+        </tr>
+    </table>
+</div>
+
+<div id='right_box'>오른쪽</div>
+
+<script>
+    // This example requires the Places library. Include the libraries=places
+    // parameter when you first load the API. For example:
+    // <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places">
+
+    var place_for_func;
+    var lat_lng;
+    var vicinity_address;
+    var number = 0;          // 테이블이나 칼럼의 아이디를 정할 때, 삭제할 때 사용한다.
+    var tempMarkers = [];    // 장소검색이나 오른쪽 클릭했을 때 지도에 잠시동안만 표시되는 마커
+    var routeMarkers = [];   // 경로에 추가를 했을때 영구적으로 표시되는 마커
+    var streetview_position; // 거리뷰로부터 이미지 추출하는 쿼리의 parameters
+    var streetview_heading;
+    var streetview_pitch;
+
+
+    function initAutocomplete() {
+        var map = new google.maps.Map(document.getElementById('map'), {
+            center: {lat: 37.56610460311275, lng: 126.98445975780487},
+            zoom: 16,
+            mapTypeId: 'roadmap'
+        });
+
+        var input = document.getElementById('pac-input');
+        var searchBox = new google.maps.places.SearchBox(input);
+        map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+
+        map.addListener('bounds_changed', function() {
+            searchBox.setBounds(map.getBounds());
+        });
+
+        // <장소를 검색하는 방법 2가지 존재>
+        // 1번 방법 : 지도상에서 마우스 클릭(유명하지 않아서 검색이 안되는 장소들의 경우)
+        // 2번 방법 : 검색을 통해 장소 검색(유명한 장소들의 경우)
+
+        //=====================================//
+        //   1번 방법(지도상에서 마우스 클릭)    //
+        //====================================//
+        map.addListener('click', function(e) {
+            // 이전에 있던 임시 마커 지우기
+            tempMarkers.forEach(function(marker) {
+                marker.setMap(null);
+            });
+            tempMarkers = [];
+
+            // 검색할 때마다 테이블의 이전 검색 내용을 지우고 새로 채워야 한다.
+            var photo_field = document.getElementById('photo_column');
+            var address_field = document.getElementById('address_column');
+            var button_field = document.getElementById('button_column');
+
+            while (photo_field.hasChildNodes()) {
+                photo_field.removeChild(photo_field.firstChild);
+            }
+            while (address_field.hasChildNodes()) {
+                address_field.removeChild(address_field.firstChild);
+            }
+            while (button_field.hasChildNodes()) {
+                button_field.removeChild(button_field.firstChild);
+            }
+
+            // 클릭(안유명한곳검색)은 이미지가 없을 확률이 높으므로 클릭 좌표의 위도, 경도를 이용해 거리뷰로 나타낸다.
+            var panorama = new google.maps.StreetViewPanorama(
+                document.getElementById('photo_column'), {
+                    position: e.latLng,
+                    pov: {
+                        heading: 34,
+                        pitch: 10
+                    }
+                }
+            );
+//            map.setStreetView(panorama); // 지도를 거리뷰 모드로 바꾸는 기능인데, 필요성을 못 느낌.
+
+            // 거리뷰로부터 이미지 추출할 때 쿼리문의 parameters
+            streetview_position = panorama.getPosition();
+            streetview_heading = panorama.getPov().heading;
+            streetview_pitch = panorama.getPov().pitch;
+
+            panorama.addListener('position_changed', function() {
+                streetview_position = panorama.getPosition();
+            });
+
+            panorama.addListener('pov_changed', function() {
+                streetview_heading = panorama.getPov().heading;
+                streetview_pitch = panorama.getPov().pitch;
+            });
+
+            // 클릭 좌표의 위도, 경도를 이용하여 주소값을 얻는다(역지오코딩). 주소 값은 거의 도로명이 나오는 듯.
+            var geocoder = new google.maps.Geocoder;
+
+            var latlng = {lat: parseFloat(e.latLng.lat()), lng: parseFloat(e.latLng.lng())};
+            lat_lng = latlng;
+
+            lat = e.latLng.lat();
+            lng = e.latLng.lng();
+
+            var bounds = new google.maps.LatLngBounds();
+
+            geocoder.geocode({'location': latlng}, function(results, status) {
+                if (status === 'OK') {
+                    if (results[1]) { // results[1]은 place Json임.
+                        // results[1]로 하는 이유는 주소 가독성이 좋기 때문.
+                        // results[0].formatted_address: "275-291 Bedford Ave, Brooklyn, NY 11211, USA",
+                        // results[1].formatted_address: "Williamsburg, NY, USA"
+                        address_field.innerHTML += results[1].formatted_address;
+                        vicinity_address = results[1].formatted_address;
+
+                        // 임시마커에 저장하여 지도에 표시
+                        tempMarkers.push(new google.maps.Marker({
+                            map: map,
+                            title: results[1].name,
+                            position: latlng
+                        }));
+
+                        if (results[1].geometry.viewport) {
+                            // Only geocodes have viewport.
+                            bounds.union(results[1].geometry.viewport);
+                        }
+                        else {
+                            bounds.extend(results[1].geometry.location);
+                        }
+
+                        map.fitBounds(bounds);
+                    }
+                }
+//                else { // OVER QUERY?? 오류 안뜨게
+//                    window.alert('Geocoder failed due to: ' + status);
+//                }
+            });
+
+            button_field.innerHTML += "<button onclick='route_Add_By_Click()'> 클릭추가 </button>";
+        });
+
+
+        //=====================================//
+        //     2번 방법(SearchBox에서 검색)     //
+        //====================================//
+        searchBox.addListener('places_changed', function() {
+            // 이전에 있던 마커 지우기
+            tempMarkers.forEach(function(marker) {
+                marker.setMap(null);
+            });
+            tempMarkers = [];
+
+            var places = searchBox.getPlaces();
+
+            if (places.length == 0) {
+                return;
+            }
+
+            // For each place, get the icon, name and location.
+            var bounds = new google.maps.LatLngBounds();
+
+            places.forEach(function(place) {
+                if (!place.geometry) {
+                    console.log("Returned place contains no geometry");
+                    return;
+                }
+
+                ////////////////////////////////////////////////////////////////////////////////
+                //******************************************************************************
+                /* 검색하면 화면에 추가되는 거는 places.forEach(function(place) { 안에 있어야 가능*/
+
+                // 검색하면 왼쪽화면 밑의 테이블에 정보들이 채워지는 과정
+                place_for_func = place;
+
+                // 왼쪽화면 테이블 1열 장소사진
+                var photo_field = document.getElementById('photo_column');
+                var photo_url = place.photos[0].getUrl({'maxWidth':200, 'maxHeight':200});
+                while (photo_field.hasChildNodes()) {
+                    photo_field.removeChild(photo_field.firstChild);
+                }
+                photo_field.innerHTML += "<img src=\'" + photo_url + "\'>";
+
+                // 명동관광정보센터
+//                https://lh3.googleusercontent.com/-w2cxqRc4U90/VcVryhyCaqI/AAAAAAAAAFI/J7rjwF0zc5wzaC_OKRN9mim6KY3yVDEfACJkC/w200-h200-k-no/
+
+
+                // 왼쪽화면 테이블 2열 장소명, 주소
+                var place_name = place.name;
+                var place_address = place.formatted_address; // *****************************8
+                var address_field = document.getElementById('address_column');
+                while (address_field.hasChildNodes()) {
+                    address_field.removeChild(address_field.firstChild);
+                }
+                address_field.innerHTML += "<li>" + place_name + "</li><br>";
+                address_field.innerHTML += "<li>" + place_address + "</li>";
+
+                // 왼쪽화면 테이블 3열 추가버튼
+                var button_field = document.getElementById('button_column');
+                while (button_field.hasChildNodes()) {
+                    button_field.removeChild(button_field.firstChild);
+                }
+                if(address_field.hasChildNodes()){
+                    button_field.innerHTML += "<button onclick='route_Add()'> 검색추가 </button>" ;
+                }
+                //******************************************************************************
+                ////////////////////////////////////////////////////////////////////////////////
+
+//                var icon = {
+//                    url: place.icon,
+//                    size: new google.maps.Size(71, 71),
+//                    origin: new google.maps.Point(0, 0),
+//                    anchor: new google.maps.Point(17, 34),
+//                    scaledSize: new google.maps.Size(25, 25)
+//                };
+
+                // 임시마커에 저장하여 지도에 표시
+                tempMarkers.push(new google.maps.Marker({
+                    map: map,
+                    title: place.name,
+                    position: place.geometry.location
+                }));
+
+                if (place.geometry.viewport) {
+                    // Only geocodes have viewport.
+                    bounds.union(place.geometry.viewport);
+                }
+                else {
+                    bounds.extend(place.geometry.location);
+                }
+            }); // places.forEach(function(place) { 가 감싸는 부분
+            map.fitBounds(bounds);
+        }); // searchBox.addListener('places_changed', function() { 가 감싸는 부분
+    } // initAutocomplete가 감싸고 있는 부분
+
+    //============================================================//
+    //   클릭 좌표에 해당하는 장소를 추가하는 버튼의 함수.(1번 방법)   //
+    //============================================================//
+    function route_Add_By_Click(){ // place_for_func변수 이용
+        // innerHTML을 통해 <p>, <div> 이런 html요소들을 넣으면 화면이 까매짐
+        // appendchild를 통해 넣으면 안그런다.
+
+        var right_box = document.getElementById('right_box');
+
+        var new_table = document.createElement("TABLE");
+        new_table.setAttribute("id", number+"th_table");
+
+        var new_tr = document.createElement("TR");
+        new_table.appendChild(new_tr);
+
+        // 테이블 1열 번호
+        var td1 = document.createElement("TD");
+        var td1_li1 = document.createElement("li");
+        td1_li1.setAttribute("id", number+"th_route");
+        td1_li1.appendChild(document.createTextNode((number+1)+"번 여행경로"));
+        td1.appendChild(td1_li1);
+        new_tr.appendChild(td1);
+
+        // 개선점 : 왼쪽화면에서 스트릿뷰를 조절할 때 휠로 확대하고 축소하는건 반영하는 방법이 없는 듯....
+        // 테이블 2열 이미지(from 스트릿뷰)
+        var photo_streetview = "https://maps.googleapis.com/maps/api/streetview?size=200x200&location=";
+        photo_streetview += streetview_position.toString().slice(1, -1);
+        photo_streetview += "&heading=";
+        photo_streetview += streetview_heading.toString();
+        photo_streetview += "&pitch=";
+        photo_streetview += streetview_pitch.toString();
+        photo_streetview += "&key=AIzaSyAKHgj4JBJBo5tMAkUoeKvsNlBSTO-HIQ8";
+        var td2 = document.createElement("TD");
+        var td2_img = document.createElement("img");
+        td2_img.setAttribute("src", photo_streetview);
+        td2.appendChild(td2_img);
+        new_tr.appendChild(td2);
+
+        // 테이블 3열 주소
+        var td3 = document.createElement("TD");
+        var td3_li = document.createElement("li");
+        td3_li.appendChild(document.createTextNode(vicinity_address));
+        td3.appendChild(td3_li);
+        new_tr.appendChild(td3);
+
+        // 테이블 4열 삭제 버튼
+        var td4 = document.createElement("TD");
+        var td4_button = document.createElement("button");
+        td4_button.innerHTML+="삭제";
+        td4_button.setAttribute("id", ''+number);
+        td4_button.addEventListener("click", function() {
+            route_Delete(this);}
+        );
+        td4.appendChild(td4_button);
+        new_tr.appendChild(td4);
+
+        right_box.appendChild(new_table);
+
+        number++;
+
+        // 임시마커에 있던 정보를 routeMarkers에 저장.
+        var tempMap = tempMarkers[0].map;
+        var tempTitle = tempMarkers[0].title;
+        var tempPosition = tempMarkers[0].position;
+
+//        같은 장소를 추가-삭제-추가하는 경우를 생각해야함.
+//        tempMarkers.forEach(function(marker) {
+//            marker.setMap(null);
+//        });
+//        tempMarkers = [];
+
+        routeMarkers.push(new google.maps.Marker({
+            map: tempMap,
+            title: tempTitle,
+            position: tempPosition
+        }));
+    }
+
+
+    //====================================================================//
+    //   Search Box에서 검색으로 찾은 장소를 추가하는 버튼의 함수(2번 방법)   //
+    //===================================================================//
+    function route_Add(){ // place_for_func변수 이용
+        var right_box = document.getElementById('right_box');
+        var photo = place_for_func.photos[0].getUrl({'maxWidth':200, 'maxHeight':200});
+
+        var new_table = document.createElement("TABLE");
+        new_table.setAttribute("id", number+"th_table");
+
+        var new_tr = document.createElement("TR");
+        new_table.appendChild(new_tr);
+
+        // 테이블 1열 번호
+        var td1 = document.createElement("TD");
+        var td1_li1 = document.createElement("li");
+        td1_li1.setAttribute("id", number+"th_route");
+        td1_li1.appendChild(document.createTextNode((number+1)+"번 여행경로"));
+        td1.appendChild(td1_li1);
+        new_tr.appendChild(td1);
+
+        // 테이블 2열 이미지
+        var td2 = document.createElement("TD");
+        var td2_img = document.createElement("img");
+        td2_img.setAttribute("src", photo);
+        td2.appendChild(td2_img);
+        new_tr.appendChild(td2);
+
+        // 테이블 3열 장소명, 주소
+        var td3 = document.createElement("TD");
+        var td3_li1 = document.createElement("li");
+        var td3_li2 = document.createElement("li");
+        td3_li1.appendChild(document.createTextNode(place_for_func.name));
+        td3_li2.appendChild(document.createTextNode(place_for_func.vicinity));
+        td3.appendChild(td3_li1);
+        td3.appendChild(td3_li2);
+        new_tr.appendChild(td3);
+
+        // 테이블 4열 삭제버튼
+        var td4 = document.createElement("TD");
+        var td4_button = document.createElement("button");
+        td4_button.setAttribute("id", ''+number);
+        td4_button.innerHTML+="삭제";
+        td4_button.addEventListener("click", function() {
+            route_Delete(this);}
+        );
+        td4.appendChild(td4_button);
+        new_tr.appendChild(td4);
+
+        right_box.appendChild(new_table);
+
+        number++;
+
+        // 임시마커에 있던 정보를 routeMarkers에 저장.
+        var tempMap = tempMarkers[0].map;
+        var tempTitle = tempMarkers[0].title;
+        var tempPosition = tempMarkers[0].position;
+
+//        같은 장소를 추가-삭제-추가하는 경우를 생각해야함.
+//        tempMarkers.forEach(function(marker) {
+//            marker.setMap(null);
+//        });
+//        tempMarkers = [];
+
+        routeMarkers.push(new google.maps.Marker({
+            map: tempMap,
+            title: tempTitle,
+            position: tempPosition
+        }));
+    }
+
+
+
+    //================================================================= //
+    //   오른쪽 화면에 추가된 테이블의 삭제 버튼의 함수(테이블, 마커삭제)    //
+    //================================================================= //
+    function route_Delete(e){
+        //=============================//
+        // 테이블 삭제 및 정렬 부분 시작 //
+        //=============================//
+        var right_box = document.getElementById('right_box');        // e.id는 버튼의 id값이지만 remove를 할 때 테이블이 버튼보다
+        var remove_table = document.getElementById(e.id+"th_table"); // right_box에 가까이 있어서 테이블을 삭제할 수 있는 것 같다.
+
+        if(e.id == (number-1)) {     // 1,2,3,...,n 경로 중 n번째 경로 삭제하는 경우
+            right_box.removeChild(remove_table);
+        }
+        else if(e.id < (number-1)) { // 1,2,3,...,n 경로 중 n번째가 아닌 경로 삭제하는 경우
+            // 테이블 재정렬(ex. 1,4,5가 남았다면 1,2,3으로 정렬한다는 뜻)
+
+
+
+//            // 기존 방법
+//            remove_table.setAttribute("id", 99999+"th_table");
+//
+//            for (var i = (e.id+1); i <= (number-1); i++) {
+//                var temp_table = document.getElementById(i+"th_table");
+//
+////                temp_table.rows[0].cells[0].getElementById(i+"th_route").appendChild(document.createTextNode(i+"번 여행경로"));
+//                temp_table.rows[0].getElementById(i+"th_route").setAttribute("id", (i-1)+"th_route"); // 번호 -1
+//
+//                if(temp_table.rows[0].hasAttribute(i+"th_panorama")) { // 스트릿뷰라면 -1
+//                    temp_table.rows[0].getElementById(i+"th_panorama").setAttribute("id", (i-1)+"th_panorama");
+//                }
+//
+//                temp_table.rows[0].getElementById(''+i).setAttribute("id", ''+(i-1)); // 버튼 -1
+//
+//                temp_table.setAttribute("id", (i-1)+"th_table"); // 테이블 -1
+//            }
+//
+//            right_box.removeChild(remove_table);
+
+
+            // 새로운 방법
+            for (var i = e.id;  i < (number-1);  i++ ) {
+                var current_table = document.getElementById(i+"th_table");
+                var next_table = document.getElementById((i+1)+"th_table");
+                current_table.rows[0].cells[1].style.backgroundColor = 'black';
+                current_table.rows[0].cells[2].style.backgroundColor = 'red';
+//                current_table.rows[0].cells[1].setAttribute("src", next_table.rows[0].cells[1].getElementById("src"));
+//                current_table.rows[0].cells[2] = [];
+//                current_table.rows[0].cells[1].appendChild(next_table.rows[0].cells[1].innerHTML);
+//                current_table.rows[0].cells[2].appendChild(next_table.rows[0].cells[2].innerHTML);
+//                current_table.rows[0].cells[1].innerHTML = next_table.rows[0].cells[1].innerHTML;
+//                current_table.rows[0].cells[2].innerHTML = next_table.rows[0].cells[2].innerHTML;
+            }
+
+            right_box.removeChild(document.getElementById((number-1)+"th_table"));
+
+        }
+
+        //=============================//
+        //  마커 삭제 및 정렬 부분 시작  //
+        //=============================//
+        if(e.id == (number-1)) {      // 1,2,3,...,n 경로 중 n번째 마커 삭제하는 경우
+            routeMarkers[e.id].setMap(null); // 지도에서 해당 마커을 안보이게 처리
+            routeMarkers.pop();              // pop()은 가장 끝의 마커를 삭제한다.
+        }
+        else if(e.id < (number-1)) {  // 1,2,3,...,n 경로 중 n번째가 아닌 마커 삭제하는 경우
+            routeMarkers[e.id].setMap(null); // 지도에서 해당 마커을 안보이게 처리
+            routeMarkers[e.id] = [];         // 해당 마커를 삭제한다.
+
+            // 마커 재정렬(ex. 1,4,5가 남았다면 1,2,3으로 정렬한다는 뜻)
+            for (var i = e.id; i < (number-1); i++) {
+                routeMarkers[i] = routeMarkers[i+1];
+            }
+
+            routeMarkers[(number-1)].setMap(null);
+            routeMarkers[(number-1)] = [];
+        }
+        number--;
+    }
+
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAKHgj4JBJBo5tMAkUoeKvsNlBSTO-HIQ8&libraries=places&callback=initAutocomplete"
+        async defer></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script src="../bootstrap/js/bootstrap.min.js"></script>
+</body>
+</html>

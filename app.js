@@ -13,6 +13,7 @@ const index = require('./routes/index');            // index 페이지 import
 const users = require('./routes/users');            // users 페이지 import
 const testMapSearch = require('./routes/testMapSearch');   // testMapSearch 페이지 import
 const testMakeGuidePlan = require('./routes/testMakeGuidePlan'); // testMakeGuidePlan 페이지 import
+const testFloatingTable = require('./routes/testFloatingTable'); // testFloatingTable 페이지 import
 
 const app = express();
 
@@ -33,7 +34,7 @@ app.use('/', index);                              // 라우팅 http://0.0.0.0/
 app.use('/users', users);                         // 라우팅 http://0.0.0.0/users
 app.use('/testMapSearch', testMapSearch);         // 라우팅 http://0.0.0.0/testMapSearch  지도 검색
 app.use('/testMakeGuidePlan', testMakeGuidePlan); // 라우팅 http://0.0.0.0/testMakeGuidePlan 가이드 경로 만드는 페이지
-
+app.use('/testFloatingTable', testFloatingTable); // 라우팅 http://0.0.0.0/testFloatingTable
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
