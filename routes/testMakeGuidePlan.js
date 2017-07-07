@@ -1,6 +1,7 @@
 /**
  * Created by heony on 2017-06-21.
  */
+ /* variable naming*/
 const express = require('express');
 const router = express.Router();
 
