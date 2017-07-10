@@ -75,6 +75,8 @@
             // infowindow.close();
             marker.setVisible(false);
             var place = autocomplete.getPlace();
+
+
             if(place.geometry.viewport){
                 alert(place.geometry.viewport+" view");
                 map.fitBounds(place.geometry.viewport);
@@ -82,21 +84,25 @@
                 alert(place.geometry.location+"location");
                 map.setCenter(place.geometry.location);
             }
+
             marker.setPosition(place.geometry.location);
             marker.setVisible(true);
+
             var contents ='<h1>'+place.name+'</h1>'
                 +'<img src='+place.photos[0].getUrl({'maxWidth':100, 'maxHeight':100})+'></img>'
                 +'<p>'+place.formatted_address+'</p>'
                 +'<button>버튼</button>';
+
             var infowindow = new google.maps.InfoWindow({
                 content: contents
             });
+
             infowindow.open(map,marker);
             mapsClick(place);
         });
     }
 
-    function mapsClick(info){
+    function mapsClick(info){ // 왼쪽화면 테이블에 정보 채워지는 함수
         // alert(info.name+ info.formatted_address);
         var t1 = document.getElementById('showImg');
         var t2 = document.getElementById('content');

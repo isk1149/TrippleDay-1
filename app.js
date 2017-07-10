@@ -1,37 +1,46 @@
 const express = require('express');
 const path = require('path');
 
-const favicon = require('serve-favicon');                          // 사이트 왼쪽에 나타나는 아이콘 ex. 네이버 접속하면 초록색 N모양 아이콘
-// uncomment after placing your favicon in /public
+const logger = require('morgan');              // 로그 관련..?
+const favicon = require('serve-favicon');      // 사이트 왼쪽에 나타나는 아이콘 ex. 네이버 접속하면 초록색 N모양 아이콘
+const bodyParser = require('body-parser');     // post방식으로 요청할때 데이터를 파싱하기 위한 모듈
+const cookieParser = require('cookie-parser'); // 쿠키 파싱
 
-
-const logger = require('morgan');
-const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');
-
-const index = require('./routes/index');            // index 페이지 import
-const users = require('./routes/users');            // users 페이지 import
-const testMapSearch = require('./routes/testMapSearch');   // testMapSearch 페이지 import
+const index = require('./routes/index');                         // index 페이지 import
+const testMapSearch = require('./routes/testMapSearch');         // testMapSearch 페이지 import
 const testMakeGuidePlan = require('./routes/testMakeGuidePlan'); // testMakeGuidePlan 페이지 import
 const testFloatingTable = require('./routes/testFloatingTable'); // testFloatingTable 페이지 import
 
 const app = express();
 
-// Jade 템플릿 사용하기 어려움 ejs로 대체하자.
+// Jade 템플릿 사용하기 어려움 ejs로 대체해야함.
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
-app.use(favicon(path.join(__dirname, 'public/images', 'favicon.ico'))); // 나중에 아이콘 제작하게 되면 사용할 예정
+// favicon
+app.use(favicon(path.join(__dirname, 'public/images', 'favicon.ico')));
 
+// 아직 안 쓰는 부분.
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+
+//===============//
+// 파일 path 단축 // html에서 Bootstrap 로드할때 단축된 path를 써서 로드 가능.
+//===============//
+app.use('/moment', express.static(__dirname + '/node_modules/moment/min'));
+app.use('/bootstrap/dist', express.static(__dirname + '/node_modules/bootstrap/dist'));
+app.use('/bootstrap-datepicker', express.static(__dirname + '/node_modules/bootstrap-datepicker/dist'));
+
+
+//==============//
+// 페이지 라우팅 //
+//==============//
 app.use('/', index);                              // 라우팅 http://0.0.0.0/
-app.use('/users', users);                         // 라우팅 http://0.0.0.0/users
 app.use('/testMapSearch', testMapSearch);         // 라우팅 http://0.0.0.0/testMapSearch  지도 검색
 app.use('/testMakeGuidePlan', testMakeGuidePlan); // 라우팅 http://0.0.0.0/testMakeGuidePlan 가이드 경로 만드는 페이지
 app.use('/testFloatingTable', testFloatingTable); // 라우팅 http://0.0.0.0/testFloatingTable
@@ -42,6 +51,7 @@ app.use(function(req, res, next) {
   err.status = 404;
   next(err);
 });
+
 
 // error handler
 app.use(function(err, req, res, next) {
