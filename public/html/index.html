@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 위 3개의 메타 태그는 *반드시* head 태그의 처음에 와야합니다; 어떤 다른 콘텐츠들은 반드시 이 태그들 *다음에* 와야 합니다 -->
+
+    <title>Tripple Day</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
+    <script src="/moment/moment.min.js"></script>
+    <link rel="stylesheet" href="bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="bootstrap-datepicker/css/bootstrap-datepicker3.min.css">
+
+    <!-- IE8 에서 HTML5 요소와 미디어 쿼리를 위한 HTML5 shim 와 Respond.js -->
+    <!-- WARNING: Respond.js 는 당신이 file:// 을 통해 페이지를 볼 때는 동작하지 않습니다. -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+
+    <![endif]-->
+
+    <style>
+        /*#searchPlace {*/
+            /*background-color: #fff;*/
+            /*font-family: Roboto;*/
+            /*font-size: 15px;*/
+            /*font-weight: 300;*/
+            /*!*margin-left: 12px;*!*/
+            /*padding: 0 11px 0 13px;*/
+            /*text-overflow: ellipsis;*/
+            /*width: 200px;*/
+        /*}*/
+
+        /*#searchPlace:focus {*/
+            /*border-color: #4d90fe;*/
+        /*}*/
+        body {
+            padding-top: 300px;
+        }
+    </style>
+
+</head>
+<body>
+<!--네이게이션 바 부분-->
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand navbar-left" href="./">
+                <a class="navbar-brand" href="./"><Strong>Tripple Day</Strong><span class="sr-only">(current)</span></a>
+                <img alt="Brand" src="../images/imgTripple50x50.png" class="img-circle">
+            </a>
+
+        </div>
+
+        <div id="navbar" class="navbar-collapse collapse">
+            <!--<ul class="nav navbar-nav">-->
+                <!--<li class="active"><a href="#">Home</a></li>-->
+                <!--<li><a href="#about">About</a></li>-->
+                <!--<li><a href="#contact">Contact</a></li>-->
+                <!--<li class="dropdown">-->
+                    <!--<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown <span class="caret"></span></a>-->
+                    <!--<ul class="dropdown-menu" role="menu">-->
+                        <!--<li><a href="#">Action</a></li>-->
+                        <!--<li><a href="#">Another action</a></li>-->
+                        <!--<li><a href="#">Something else here</a></li>-->
+                        <!--<li class="divider"></li>-->
+                        <!--<li class="dropdown-header">Nav header</li>-->
+                        <!--<li><a href="#">Separated link</a></li>-->
+                        <!--<li><a href="#">One more separated link</a></li>-->
+                    <!--</ul>-->
+                <!--</li>-->
+            <!--</ul>-->
+
+            <ul class="nav navbar-nav navbar-right">
+                <li><img src="../images/emptyprofile50x50.png" alt="Responsive image" class="img-circle"></li>
+                <li><a href="#">로그인</a></li>
+                <li><a href="#">회원가입</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">MyTrip<span class="caret"></span></a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="#">가이드</a></li>
+                        <li><a href="#">여행자</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div><!--/.nav-collapse-fruid -->
+    </div>
+</nav>
+
+
+<!--장소, 날짜, 난이도 검색 부분-->
+<div class="container" align="center">
+    <!--<div class="jumbotron" align="center">-->
+        <form class="form-inline">
+            <div class="form-group">
+                <div class="input-group">
+                    <input type="text" class="form-control input-lg" id="searchPlace" placeholder="어디에서?">
+                    <div class="input-group-addon"><i class="glyphicon glyphicon-map-marker"></i></div>
+                </div>
+                <div class="input-group">
+                    <input type="text" class="datepicker form-control input-lg" id="searchDate" placeholder="언제?">
+                    <div class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></div>
+                </div>
+                <div class="input-group">
+                    <select class="form-control input-lg" id="tripLevel">
+                        <option>초보</option>
+                        <option>중수</option>
+                        <option>고수</option>
+                    </select>
+                    <div class="input-group-addon"><i class="glyphicon glyphicon-star"></i></div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-default btn-lg glyphicon glyphicon-search"></button>
+        </form>
+
+        <br>
+
+        <!--<div class="row">-->
+            <!--<div class="col-md-1">.col-md-1</div>-->
+            <!--<div class="col-md-1">.col-md-1</div>-->
+            <!--<div class="col-md-1">.col-md-1</div>-->
+            <!--<div class="col-md-1">.col-md-1</div>-->
+            <!--<div class="col-md-1">.col-md-1</div>-->
+            <!--<div class="col-md-1">.col-md-1</div>-->
+            <!--<div class="col-md-1">.col-md-1</div>-->
+            <!--<div class="col-md-1">.col-md-1</div>-->
+            <!--<div class="col-md-1">.col-md-1</div>-->
+            <!--<div class="col-md-1">.col-md-1</div>-->
+            <!--<div class="col-md-1">.col-md-1</div>-->
+            <!--<div class="col-md-1">.col-md-1</div>-->
+        <!--</div>-->
+        <!--<div class="row">-->
+            <!--<div class="col-md-8">.col-md-8</div>-->
+            <!--<div class="col-md-4">.col-md-4</div>-->
+        <!--</div>-->
+        <!--<div class="row">-->
+            <!--<div class="col-md-4">.col-md-4</div>-->
+            <!--<div class="col-md-4">.col-md-4</div>-->
+            <!--<div class="col-md-4">.col-md-4</div>-->
+        <!--</div>-->
+        <!--<div class="row">-->
+            <!--<div class="col-md-6">.col-md-6</div>-->
+            <!--<div class="col-md-6">.col-md-6</div>-->
+        <!--</div>-->
+
+        <!--<h1>Navbar example</h1>-->
+        <!--<p>This example is a quick exercise to illustrate how the default, static and fixed to top navbar work. It includes the responsive CSS and HTML, so it also adapts to your viewport and device.</p>-->
+        <!--<p>To see the difference between static and fixed top navbars, just scroll.</p>-->
+        <!--<p>-->
+            <!--<a class="btn btn-lg btn-primary" href="../../components/#navbar" role="button">View navbar docs &raquo;</a>-->
+        <!--</p>-->
+    <!--</div>-->
+</div> <!-- /container -->
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+<div class="container" align="center">
+    <h3><strong>추천 루트</strong></h3>
+    <img src="../images/recommandRoute.png" class="img-responsive" alt=""Responsive image">
+</div>
+<script>
+    function initAutocomplete() {
+        // 메인페이지에서 지도 검색시 도시까지만 출력되도록
+        var options = {
+            types: ['(cities)']
+        };
+        var inputGoogleMap = document.getElementById('searchPlace');
+        var searchbox = new google.maps.places.Autocomplete(inputGoogleMap, options);
+    }
+
+    // 달력 생성하는 함수
+    $('.datepicker').datepicker({
+        format: 'mm월 dd일',
+        todayHighlight: true,
+        autoclose: true,
+    });
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAKHgj4JBJBo5tMAkUoeKvsNlBSTO-HIQ8&libraries=places&callback=initAutocomplete"
+        async defer></script>
+<script src="/bootstrap/dist/js/bootstrap.min.js"></script>
+</body>
+</html>
