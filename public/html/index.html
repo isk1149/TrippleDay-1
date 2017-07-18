@@ -10,6 +10,8 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script src="/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
+    <!--bootstrap-datepicker.ko.min.js이 달력 한글 버전이고 locales폴더에 81개 정도 다른 언어 버전 있음.-->
+    <script src="/bootstrap-datepicker/locales/bootstrap-datepicker.ko.min.js"></script>
     <script src="/moment/moment.min.js"></script>
     <link rel="stylesheet" href="bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="bootstrap-datepicker/css/bootstrap-datepicker3.min.css">
@@ -172,6 +174,7 @@
     <h3><strong>추천 루트</strong></h3>
     <img src="../images/recommandRoute.png" class="img-responsive" alt=""Responsive image">
 </div>
+
 <script>
     function initAutocomplete() {
         // 메인페이지에서 지도 검색시 도시까지만 출력되도록
@@ -187,6 +190,7 @@
         format: 'mm월 dd일',
         todayHighlight: true,
         autoclose: true,
+        language: 'ko'
     });
 </script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAKHgj4JBJBo5tMAkUoeKvsNlBSTO-HIQ8&libraries=places&callback=initAutocomplete"
