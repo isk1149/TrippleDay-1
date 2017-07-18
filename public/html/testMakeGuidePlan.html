@@ -26,7 +26,7 @@
         }
 
         html {
-            height: 100%;
+            height: 95%;
             margin: 0;
             padding: 0;
         }
@@ -36,6 +36,12 @@
             margin: 0;
             padding: 0;
             padding-top: 50px /*body의 padding-top이 있어야 네이게이션바에 안가려짐*/
+        }
+
+        /* 검색 창 */
+        .form-control {
+            margin-top: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
         }
 
         .controls {
@@ -52,12 +58,12 @@
         #pac-input {
             background-color: #fff;
             font-family: Roboto;
-            font-size: 15px;
+            font-size: 17px;
             font-weight: 300;
-            margin-left: 12px;
             padding: 0 11px 0 13px;
             text-overflow: ellipsis;
             width: 300px;
+            height: 38px;
         }
 
         #pac-input:focus {
@@ -101,49 +107,57 @@
             list-style:none;
         }
 
-        .table{
+        /*테이블 구조*/
+        /*table*/
+            /*thead*/
+                /*tr*/
+                    /*th 클래스가 col-md-숫자*/
+            /*tbody 아이디가 route_tbody*/
+                /*tr*/
+                    /*td*/
+
+        #tableContainer {
             width: 100%;
-            /*height: 20px;*/
-            /*border: 2px solid black;*/
+            height: 90%;
+            overflow: auto;
+        }
+
+        .table {
+            width: 100%;
             margin-top: 3px;
         }
 
-        td{
-            border: 1px solid black;
-            text-align:center;
-            vertical-align: middle;
+        th {
+            text-align: center;
         }
 
-        /*이미지 안 잘리게 해야하는 거 해결해야함!!!!*/
-        td img{
-            width:200px;
-            height:150px;
+        tbody tr {
+            height: 160px;
         }
 
-        td button{
-            width: 100%;
-            height: 100%;
+        tbody td {
+            text-align: center;     /*   text-align은 적용이 됨.1열, 3열에    */
+            vertical-align: middle; /* vertical-align은 적용이 안됨 전부. 생성되는 td의 height와 연관이 있는듯.. */
         }
 
-        .column_num {
-            width: 10%;
+        /*    이미지도 화질떨어지는 문제 해결해야 함.    */
+        tbody td img {
+            width: 230px;
+            max-width: 100%;
+            height: 155px;
+            max-height: 100%;
         }
 
-        .column_img {
-            width: 30%;
-        }
+        /*     억지로 셀의 수직 가운데 정렬하는 부분.....      */
+        /*#delBtn  {*/
+            /*margin-top: 65%;*/
+            /*width: 100%;*/
+            /*height: 100%;*/
+        /*}*/
 
-        .column_info {
-            width: 40%;
-        }
-
-        .column_delete {
-            width: 10%;
-        }
-
-        .column_arrow {
-            width: 10%;
-        }
+        /*#upBtn {*/
+            /*margin-top: 45%;*/
+        /*}*/
 
     </style>
 </head>
@@ -164,7 +178,6 @@
                 <img alt="Brand" src="../images/imgTripple50x50.png" class="img-circle">
             </a>
         </div>
-
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-right">
                 <li><img src="../images/emptyprofile50x50.png" alt="Responsive image" class="img-circle"></li>
@@ -178,29 +191,39 @@
                     </ul>
                 </li>
             </ul>
-        </div><!--/.nav-collapse-fruid -->
+        </div>
+
     </div>
 </nav> <!--네이게이션 바 부분 끝-->
 
-<div id="left_box" align="center"><h5><strong>장소 찾기(1.검색창 이용 / 2.지도에서 클릭)</strong>   왼쪽(id="left_box")</h5>
-    <input id="pac-input" class="controls" type="text" placeholder="Search Box">
+<div id="left_box" align="center">
+    <h5><strong>장소 찾기(1.검색창 이용 / 2.지도에서 클릭)</strong>   왼쪽(id="left_box")</h5>
+    <input id="pac-input" class="form-control" type="text" placeholder="장소 검색">
     <div id="map"></div>
 </div>
 
-<div id="right_box" align="center"><h5><strong>여행 경로 만들기</strong>   오른쪽(id="right_box")</h5>
-        <table class="table table-striped table-bordered table-responsive">
+<div id="right_box" align="center">
+    <h5><strong>여행 경로 만들기</strong>   오른쪽(id="right_box")</h5>
+
+    <div id="tableContainer" class="container">
+        <table class="table table-bordered table-hover table-responsive">
             <thead>
                 <tr>
-                    <th class="column_num">번호</th>
-                    <th class="column_img">사진</th>
-                    <th class="column_info">정보</th>
-                    <th class="column_delete">삭제</th>
-                    <th class="column_arrow">화살표</th>
+                    <th style="width:10%">번호</th>
+                    <th style="width:30%">사진</th>
+                    <th style="width:40%">정보</th>
+                    <th style="width:10%">삭제</th>
+                    <th style="width:10%">화살표</th>
                 </tr>
             </thead>
-            <tbody id="route_table">
+            <tbody id="route_tbody">
             </tbody>
         </table>
+    </div>
+    <br>
+    <button class="btn btn-default" type="submit" onclick="route_Reset()">초기화</button>
+    <button class="btn btn-default" type="submit">임시 저장</button>
+    <button class="btn btn-default btn-primary" type="submit">다음 단계</button>
 </div>
 
 <script>
@@ -215,17 +238,45 @@
 
     function initAutocomplete() {
         var map = new google.maps.Map(document.getElementById('map'), {
-            center: {lat: 37.56610460311275, lng: 126.98445975780487},
-            zoom: 16,
-            mapTypeId: 'roadmap'
+            center: {lat: 37.56610460311275, lng: 126.98445975780487}, // 처음 좌표를 현재 GPS 위치로 하고 싶음..
+            zoom: 16,                                                  // ex. 서울에서 사이트에 접속하면 서울이 지도에 표시되도록...
+            mapTypeId: 'roadmap',
+            mapTypeControl: false // 위성, 지형 모드 전환 기능
         });
 
-        var input = document.getElementById('pac-input');
-        var searchBox = new google.maps.places.SearchBox(input);
-        map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+        // 현재 디바이스가 접속하고 있는 위치를 지도에서 표시(ex. 강남에서 접속중이면 첫 지도 화면이 강남)
+        // Try HTML5 geolocation.
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                var pos = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+                map.setCenter(pos);
+            }, function() {
+                handleLocationError(true, map.getCenter());
+            });
+        }
+        else {
+            // Browser doesn't support Geolocation
+            handleLocationError(false, map.getCenter());
+        }
+
+        function handleLocationError(browserHasGeolocation) {
+            if(browserHasGeolocation == true) {
+                alert('Error: The Geolocation service failed. 현재 위치 서비스 실패');
+            }
+            else {
+                alert('Error: Your browser doesn\'t support geolocation. 브라우저에서 현재 위치 지원 안함');
+            }
+        }
+
+        var pac_input = document.getElementById('pac-input');
+        var searchBox = new google.maps.places.SearchBox(pac_input);
+        map.controls[google.maps.ControlPosition.TOP_CENTER].push(pac_input);
 
         map.addListener('bounds_changed', function() {
-            searchBox.setBounds(map.getBounds());
+            searchBox.setBounds (map.getBounds());
         });
 
         // <장소를 검색하는 방법 2가지 존재>
@@ -241,6 +292,8 @@
                 marker.setMap(null);
             });
             tempMarkers = [];
+
+            $('#pac-input').val(''); // 검색창 내용 지우기
 
             // 클릭 좌표의 위도, 경도를 이용하여 주소값을 얻는다(역지오코딩). 주소 값은 거의 도로명이 나오는 듯.
             var geocoder = new google.maps.Geocoder;
@@ -319,6 +372,12 @@
                             panorama.setVisible(true);
                         });
 
+                        // infowindow에서 경로 추가 하지 않고 창을 닫을 때 임시 마커도 삭제
+                        google.maps.event.addListener(infowindow, 'closeclick', function() {
+                           tempMarkers[0].setMap(null);
+                           tempMarkers.pop();
+                        });
+
                         if (results[1].geometry.viewport) {
                             // Only geocodes have viewport.
                             bounds.union(results[1].geometry.viewport);
@@ -356,6 +415,9 @@
             // For each place, get the icon, name and location.
             var bounds = new google.maps.LatLngBounds();
 
+            // 검색창에 장소를 입력하고 엔터키를 누르면 여러 장소가 동시에 선택됨
+            // 해결하기 위해선 한 장소만 선택되도록 바꿔야....
+            // 즉, forEach문 사용하면 안될듯...
             places.forEach(function(place) {
                 if (!place.geometry) {
                     console.log("Returned place contains no geometry");
@@ -380,11 +442,18 @@
                 floatingInfo += '<p><h4>' + place.formatted_address + '</h4></p>';
                 floatingInfo += '<button type="button" class="btn btn-success" onclick="route_Add()">검색추가</button>';
 
-                var infoWindow = new google.maps.InfoWindow({
+                var infowindow = new google.maps.InfoWindow({
                     content: floatingInfo
                 });
 
-                infoWindow.open(map,tempMarkers[0]);
+                infowindow.open(map,tempMarkers[0]);
+
+                // infowindow에서 경로 추가 하지 않고 창을 닫을 때 임시 마커도 삭제
+                google.maps.event.addListener(infowindow, 'closeclick', function() {
+                    $('#pac-input').val(''); // 검색창 내용 지우기
+                    tempMarkers[0].setMap(null);
+                    tempMarkers.pop();
+                });
 
                 // 마커 커스터마이징할때 참고하기 위해서...
 //                var icon = {
@@ -416,20 +485,19 @@
         // innerHTML을 통해 <p>, <div> 이런 html요소들을 넣으면 화면이 까매짐
         // appendchild를 통해 넣으면 안그런다.
 
-        var route_table = document.getElementById('route_table');
+        var route_tbody = document.getElementById('route_tbody');
 
         var new_tr = document.createElement("tr");
         new_tr.setAttribute("id", totalRoutes+"th_tr");
 
         // 테이블 1열 번호
         var td1 = document.createElement("td");
-        td1.setAttribute("class", "column_num");
         td1.innerHTML = (totalRoutes+1);
         new_tr.appendChild(td1);
 
         // 개선점 : 왼쪽화면에서 스트릿뷰를 조절할 때 휠로 확대하고 축소하는건 반영하는 방법이 없는 듯....
         // 테이블 2열 이미지(from 스트릿뷰)
-        var photo_streetview = "https://maps.googleapis.com/maps/api/streetview?size=1000x1000&location=";
+        var photo_streetview = "https://maps.googleapis.com/maps/api/streetview?size=800x600&location=";
         photo_streetview += panorama.getPosition().toString().slice(1, -1);
         photo_streetview += "&heading=";
         photo_streetview += panorama.getPov().heading.toString();
@@ -437,7 +505,6 @@
         photo_streetview += panorama.getPov().pitch.toString();
         photo_streetview += "&key=AIzaSyAKHgj4JBJBo5tMAkUoeKvsNlBSTO-HIQ8";
         var td2 = document.createElement("td");
-        td2.setAttribute("class", "column_img");
         var td2_img = document.createElement("img");
         td2_img.setAttribute("src", photo_streetview);
         td2.appendChild(td2_img);
@@ -445,7 +512,6 @@
 
         // 테이블 3열 주소
         var td3 = document.createElement("td");
-        td3.setAttribute("class", "column_info");
         var td3_li = document.createElement("li");
         td3_li.appendChild(document.createTextNode(vicinity_address));
         td3.appendChild(td3_li);
@@ -453,7 +519,6 @@
 
         // 테이블 4열 삭제 버튼
         var td4 = document.createElement("td");
-        td4.setAttribute("class", "column_delete");
         var td4_button = document.createElement("button");
         td4_button.setAttribute("id", "delBtn");
         td4_button.setAttribute("type", "button");
@@ -464,7 +529,6 @@
 
         // 테이블 5열 화살표 버튼
         var td5 = document.createElement("td");
-        td5.setAttribute("class", "column_arrow");
 
         // Up 버튼
         var td5_arrowUp = document.createElement("button");
@@ -485,7 +549,7 @@
 
         new_tr.appendChild(td5);
 
-        route_table.appendChild(new_tr);
+        route_tbody.appendChild(new_tr);
 
         totalRoutes++;
 
@@ -513,22 +577,22 @@
     //   Search Box에서 검색으로 찾은 장소를 추가하는 버튼의 함수(2번 방법)   //
     //===================================================================//
     function route_Add(){ // place_for_func변수 이용
-        var route_table = document.getElementById('route_table');
+        $('#pac-input').val(''); // 검색창 내용 지우기
+
+        var route_tbody = document.getElementById('route_tbody');
 
         var new_tr = document.createElement("tr");
         new_tr.setAttribute("id", totalRoutes+"th_tr");
 
         // 테이블 1열 번호
         var td1 = document.createElement("td");
-        td1.setAttribute("class", "column_num");
         td1.innerHTML = (totalRoutes+1);
         new_tr.appendChild(td1);
 
-        var photo = place_for_func.photos[0].getUrl({'maxWidth':1000, 'maxHeight':1000});
+        var photo = place_for_func.photos[0].getUrl({'maxWidth':800, 'maxHeight':600});
 
         // 테이블 2열 이미지
         var td2 = document.createElement("td");
-        td2.setAttribute("class", "column_img");
         var td2_img = document.createElement("img");
         td2_img.setAttribute("src", photo);
         td2.appendChild(td2_img);
@@ -536,7 +600,6 @@
 
         // 테이블 3열 장소명, 주소
         var td3 = document.createElement("td");
-        td3.setAttribute("class", "column_info");
         var td3_li1 = document.createElement("li");
         var td3_li2 = document.createElement("li");
         td3_li1.appendChild(document.createTextNode(place_for_func.name));
@@ -547,7 +610,6 @@
 
         // 테이블 4열 삭제버튼
         var td4 = document.createElement("td");
-        td4.setAttribute("class", "column_delete");
         var td4_button = document.createElement("button");
         td4_button.setAttribute("id", "delBtn");
         td4_button.setAttribute("type", "button");
@@ -558,7 +620,6 @@
 
         // 테이블 5열 화살표 버튼
         var td5 = document.createElement("td");
-        td5.setAttribute("class", "column_arrow");
 
         // Up 버튼
         var td5_arrowUp = document.createElement("button");
@@ -578,7 +639,7 @@
         td5.appendChild(td5_arrowDown);
         new_tr.appendChild(td5);
 
-        route_table.appendChild(new_tr);
+        route_tbody.appendChild(new_tr);
 
         totalRoutes++;
 
@@ -634,7 +695,7 @@
         else if($tr.next().html() != null) { // 1,2,3,...,n 경로 중 n번째가 아닌 경로 삭제하는 경우
             $tr.remove(); // 행 삭제
 
-            // 여행 경로 재정렬  * Jquery 써서 코드 단축해야함!
+            // 나머지 여행 경로 재정렬
             for ( var i = (selected_tr_num+1); i <= (totalRoutes-1);  i++ ) {
                 var currentRow = document.getElementById(i+'th_tr');
                 currentRow.cells[0].innerHTML = i;
@@ -644,7 +705,7 @@
                 $(current_idStr).attr("id", to_idStr);
             }
 
-            // 마커 재정렬
+            // 나머지 마커 재정렬
             for (var i = selected_tr_num; i < (totalRoutes-1); i++) {
                 routeMarkers[i].setMap(null);
                 routeMarkers[i] = [];
@@ -746,9 +807,6 @@
 
         $($tr).next().attr("id");
 
-        // 0    1       $tr.index()값은 1
-        // 1->2    2->3 여기서 아래 버튼 누르면?
-        // 2->1    3->2 nextRow id값은? 2th_tr이고 1로 바꿔야함.
         var nextRow = document.getElementById($tr.next().attr("id"));
         var currRow = document.getElementById($tr.attr("id"));
         nextRow.cells[0].innerHTML = $tr.index()+1;
@@ -799,6 +857,28 @@
         $("#TEMP_TR").attr("id", currcurrentTR);
     }
 
+    //====================== //
+    //  여행경로 초기화 함수   //
+    //====================== //
+    function route_Reset() {
+        // 테이블 초기화
+        $('#route_tbody').empty();
+
+        // 임시 마커 초기화
+        tempMarkers.forEach(function(marker) {
+            marker.setMap(null);
+        });
+        tempMarkers = [];
+
+        // 영구 마커 초기화
+        routeMarkers.forEach(function(marker) {
+            marker.setMap(null);
+        });
+        routeMarkers = [];
+
+        // 여행 경로 수 초기화
+        totalRoutes = 0;
+    }
 
 </script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAKHgj4JBJBo5tMAkUoeKvsNlBSTO-HIQ8&libraries=places&callback=initAutocomplete"
