@@ -6,6 +6,22 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs');
 
+const bodyParser = require('body-parser');
+var mysql      = require('mysql');
+var conn = mysql.createConnection({
+  host     : 'localhost',
+  user     : 'root',
+  password : 'gkstn123',
+  database : 'test'
+});
+
+conn.connect(function(err){
+  if(!err) {
+   console.log("Database is connected ... \n\n");
+} else {
+   console.log("Error connecting database ... \n\n");
+}
+});
 /* GET home page. */
 // router.post('/', function(req, res, next) {
 //    http.request(req.value, function(req, res) {
