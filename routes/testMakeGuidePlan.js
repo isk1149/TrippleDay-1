@@ -5,7 +5,7 @@
 const express = require('express');
 const router = express.Router();
 const fs = require('fs');
-
+/*
 const bodyParser = require('body-parser');
 var mysql      = require('mysql');
 var conn = mysql.createConnection({
@@ -22,6 +22,7 @@ conn.connect(function(err){
    console.log("Error connecting database ... \n\n");
 }
 });
+*/
 /* GET home page. */
 // router.post('/', function(req, res, next) {
 //    http.request(req.value, function(req, res) {
