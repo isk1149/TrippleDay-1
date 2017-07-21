@@ -6,6 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- 위 3개의 메타 태그는 *반드시* head 태그의 처음에 와야합니다; 어떤 다른 콘텐츠들은 반드시 이 태그들 *다음에* 와야 합니다 -->
 
+
+
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+
+
+
+
     <title>Tripple Day</title>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
@@ -42,6 +52,17 @@
         body {
             padding-top: 300px;
         }
+
+
+        .modal-header, h4, .close {
+      background-color: #5cb85c;
+      color:white !important;
+      text-align: center;
+      font-size: 30px;
+  }
+  .modal-footer {
+      background-color: #f9f9f9;
+  }
     </style>
 
 </head>
@@ -85,8 +106,8 @@
 
             <ul class="nav navbar-nav navbar-right">
                 <li><img src="../images/emptyprofile50x50.png" alt="Responsive image" class="img-circle"></li>
-                <li><a href="#">로그인</a></li>
-                <li><a href="#">회원가입</a></li>
+                <li><button type="button" class="btn btn-default btn-lg" id="myBtn_login">로그인</button></li>
+                <li><button type="button" class="btn btn-default btn-lg" id="myBtn_register">회원가입</button></li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">MyTrip<span class="caret"></span></a>
                     <ul class="dropdown-menu" role="menu">
@@ -98,6 +119,145 @@
         </div><!--/.nav-collapse-fruid -->
     </div>
 </nav>
+
+
+
+
+
+
+
+
+
+
+<!------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------>
+<!-- Modal -->
+  <div class="modal fade" id="myModal_login" role="dialog">
+    <div class="modal-dialog">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header" style="padding:3px 5px;">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body" style="padding:40px 50px;">
+          <form role="form" method="post">
+            <div class="form-group">
+
+              <input type="text" class="form-control" id="login_user_email" placeholder="이메일 주소">
+            </div>
+            <div class="form-group">
+
+              <input type="password" class="form-control" id="login_user_pwd" placeholder="비밀번호">
+            </div>
+            <div class="checkbox">
+              <label><input type="checkbox" value="" checked>비밀번호 저장</label>
+            </div>
+            <p> 비밀번호가 생각나지 않으세요?</p>
+              <button type="submit" class="btn btn-default btn-block" id="login_by_email" >로그인</button>
+          </form>
+            <p>----------------------------------------------------------------------------------------------------------</p>
+          <div class="form-group">
+            <button type="submit" class="btn btn-default btn-block" id="login_by_naver" ><input type="image" src="../images/register_naver.jpg" />네이버로 로그인</button>
+
+          </div>
+          <div class="form-group">
+            <button type="submit" class="btn btn-default btn-block" id="login_by_facebook" ><input type="image" src="../images/register_facebook.jpg" />페이스북으로 로그인</button>
+
+          </div>
+          <div class="form-group">
+            <button type="submit" class="btn btn-default btn-block" id="login_by_google"><input type="image" src="../images/register_google.jpg" />구글로 로그인</button>
+          </div>
+
+          <p>----------------------------------------------------------------------------------------------------------</p>
+
+
+          <p> 계정이 없으신가요?
+          <button type="submit" class="btn btn-default btn-lg" id="goto_register" size="100%">회원가입</button>
+        </p>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="myModal_register" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header" style="padding:3px 5px;">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body" style="padding:40px 50px;">
+        <form role="form" method="post">
+
+          <div class="form-group">
+            <input type="text" class="form-control" id="register_user_email" placeholder="이메일 주소" >
+          </div>
+
+          <div class="form-group">
+            <input type="password" class="form-control" id="register_user_pwd" placeholder="비밀번호">
+          </div>
+
+          <div class="form-group">
+            <table>
+              <tr>
+                <td><input type="text" class="form-control" id="register_user_firstName" placeholder="성" size="30"> </td>
+                <td><input type="text" class="form-control" id="register_user_lastName" placeholder="이름" size="30"> </td>
+              </tr>
+            </table>
+          </div>
+
+
+            <button type="submit" class="btn btn-default btn-block" id="register_by_email"><input type="image" src="../images/register_image.jpg" />이메일로 회원가입</button>
+
+
+        </form>
+
+        <p>----------------------------------------------------------------------------------------------------------</p>
+
+        <div class="form-group">
+          <button type="submit" class="btn btn-default btn-block" id="register_by_naver" ><input type="image" src="../images/register_naver.jpg" />네이버로 회원가입</button>
+
+        </div>
+        <div class="form-group">
+          <button type="submit" class="btn btn-default btn-block" id="register_by_facebook" ><input type="image" src="../images/register_facebook.jpg" />페이스북으로 회원가입</button>
+
+        </div>
+        <div class="form-group">
+          <button type="submit" class="btn btn-default btn-block" id="register_by_google"><input type="image" src="../images/register_google.jpg" />구글로 회원가입</button>
+        </div>
+
+
+        <p>----------------------------------------------------------------------------------------------------------</p>
+
+
+        <p> 이미 계정이 있나요?
+        <button type="submit" class="btn btn-default btn-lg" id="goto_login" size="100%">로그인</button>
+      </p>
+      </div>
+      <!--
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-danger btn-default pull-left" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancel</button>
+        <p>Not a member? <a href="#">Sign Up</a></p>
+        <p>Forgot <a href="#">Password?</a></p>
+      </div>
+    -->
+
+    </div>
+
+  </div>
+</div>
+</div>
+<!------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------>
+
+
+
+
+
 
 
 <!--장소, 날짜, 난이도 검색 부분-->
@@ -172,10 +332,23 @@
 
 <div class="container" align="center">
     <h3><strong>추천 루트</strong></h3>
-    <img src="../images/recommandRoute.png" class="img-responsive" alt=""Responsive image">
+    <img src="../images/recommandRoute.png" class="img-responsive" alt="Responsive image">
 </div>
 
 <script>
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+$(document).ready(function(){
+    $("#myBtn_login").click(function(){
+        $("#myModal_login").modal();
+    });
+});
+
+$(document).ready(function(){
+    $("#myBtn_register").click(function(){
+        $("#myModal_register").modal();
+    });
+});
+
     function initAutocomplete() {
         // 메인페이지에서 지도 검색시 도시까지만 출력되도록
         var options = {
