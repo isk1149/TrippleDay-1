@@ -219,6 +219,7 @@
 		</div>
 		<% });%>
 -->
+
     <div id="tableContainer" class="container">
       <form method="post" >
         <table class="table table-bordered table-hover table-responsive">
@@ -516,12 +517,8 @@
 
         // 테이블 1열 번호
         var td1 = document.createElement("td");
-        //td1.appendChild(document.createTextNode((totalRoutes+1)+''));
         td1.innerHTML = (totalRoutes+1);
-        //td1.innerHTML+= '<input type="hidden" name="number" value="'+(totalRoutes+1)+'" />';
         new_tr.appendChild(td1);
-        // 테이블 1열 번호
-
 
 
         // 개선점 : 왼쪽화면에서 스트릿뷰를 조절할 때 휠로 확대하고 축소하는건 반영하는 방법이 없는 듯....
@@ -537,7 +534,6 @@
         var td2_img = document.createElement("img");
         td2_img.setAttribute("src", photo_streetview);
         td2.appendChild(td2_img);
-        td2.innerHTML+= '<input type="hidden" name="picture" value="'+td2_img.src+'" />';
         new_tr.appendChild(td2);
 
         // 테이블 3열 주소
@@ -545,9 +541,7 @@
         var td3_li = document.createElement("li");
         td3_li.appendChild(document.createTextNode(vicinity_address));
         td3.appendChild(td3_li);
-        td3.innerHTML+= '<input type="hidden" name="vicinity" value="'+vicinity_address+'" />';
         new_tr.appendChild(td3);
-
 
         // 테이블 4열 삭제 버튼
         var td4 = document.createElement("td");
@@ -628,9 +622,7 @@
         var td2_img = document.createElement("img");
         td2_img.setAttribute("src", photo);
         td2.appendChild(td2_img);
-        td2.innerHTML+= '<input type="hidden" name="picture" value="'+td2_img.src+'" />';
         new_tr.appendChild(td2);
-
 
         // 테이블 3열 장소명, 주소
         var td3 = document.createElement("td");
@@ -640,9 +632,7 @@
         td3_li2.appendChild(document.createTextNode(place_for_func.formatted_address));
         td3.appendChild(td3_li1);
         td3.appendChild(td3_li2);
-        td3.innerHTML+= '<input type="hidden" name="vicinity" value="'+place_for_func.formatted_address+'" />';
         new_tr.appendChild(td3);
-
 
         // 테이블 4열 삭제버튼
         var td4 = document.createElement("td");
