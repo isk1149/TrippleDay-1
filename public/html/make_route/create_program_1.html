@@ -148,10 +148,12 @@
 
 
     <div class="col-sm-8 text-left">
+      <form method="get">
 
 
-
-
+        <div class="form-group" style="margin-top:3%; width:50%">
+              <input type="text" class="form-control input-lg" name ="city" id="searchPlace" placeholder="도시" >
+            </div>
 
 
 
@@ -165,22 +167,25 @@
 
 
     </div>
-    <!--
-    <div class="col-sm-2 sidenav">
-      <div class="well">
-        <p>ADS</p>
-      </div>
-      <div class="well">
-        <p>ADS</p>
-      </div>
-    </div>
-  -->
+
   </div>
+  <button type="submit" class="btn btn-primary">다음</button>
+</form>
+
 </div>
 
 <script>
-
+function initAutocomplete() {
+    // 메인페이지에서 지도 검색시 도시까지만 출력되도록
+    var options = {
+        types: ['(cities)']
+    };
+    var inputGoogleMap = document.getElementById('searchPlace');
+    var searchbox = new google.maps.places.Autocomplete(inputGoogleMap, options);
+}
 
 </script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAKHgj4JBJBo5tMAkUoeKvsNlBSTO-HIQ8&libraries=places&callback=initAutocomplete"
+        async defer></script>
 </body>
 </html>
